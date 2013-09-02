@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Simple animation example</title>
+
+        <!--
+        Notice, this example uses jQuery ( http://jquery.com/ ).
+        Quick access link is used for jQuery instead of having
+        a local source copy of the component because jQuery is only
+        used with examples.
+        -->
+
+        <!-- Stylesheets -->
+        <link rel="stylesheet" href="../deps/OpenLayers-2.13.1/theme/default/style.css" />
+
+        <!-- Internal style -->
+        <style>
+            .simpleContainer {
+                position: relative;
+                height: 300px;
+            }
+            .map {
+                position: absolute;
+                height: 100%;
+                width: 300px;
+                border: 1px solid #ccc;
+            }
+            .legend {
+                position: absolute;
+                left: 300px;
+                height: 100%;
+                width: 200px;
+                border: 1px solid #ccc;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: contain;
+            }
+        </style>
+
+        <!-- JavaScript -->
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+        <script type="text/javascript" src="../deps/OpenLayers-2.13.1/OpenLayers.js"></script>
+        <script type="text/javascript" src="../lib/openlayers-animation-1.0.0-min.js"></script>
+
+        <script type="text/javascript">
+            jQuery(function() {
+                // API-KEY is required as part of the base URL that is used for the layers
+                // when FMI services are used.
+                var API_KEY = "insert-your-apikey-here";
+                if (!API_KEY || API_KEY === "insert-your-apikey-here") {
+                    var apiKeyErrorStr = "Check HTML source! Proper API-KEY should be set!";
+                    jQuery("#animationStatus").html(apiKeyErrorStr);
+                    alert(apiKeyErrorStr);
+
+                } else {
+
+                    // Create and initialize map with the base layer.
+
+                    var map = new OpenLayers.Map({
+                        div : 'wmsMap',
+                        allOverlays : true,
+                        projection : 'EPSG:3067',
+                        maxExtent : new OpenLayers.Bounds(-118331.366408, 6335621.167014, 875567.731907, 7907751.537264)
+                    });
+
+                    // Base layer is loaded from the service of National Land Survey of Finland to get a nice map.
+                    // More information about the service: http://kartat.kapsi.fi/
+                    var baseLayer = new OpenLayers.Layer.WMS("NLSFI", "http://tiles.kartat.kapsi.fi/taustakartta", {
+                        layers : "taustakartta"
+                    });
+                    map.addLayer(baseLayer);
+                    // map.zoomToMaxExtent();
+                    // Zoom a little bit to make the initial view look better.
+                    map.zoomTo(1);
+                    map.addControl(new OpenLayers.Control.LayerSwitcher());
+
+                    // Create animation layer.
+
+                    // Controller handles animation events.
+                    var ctrl = {
+                        events : new OpenLayers.Events(this)
+                    };
+
+                    // Initialize options objects for animation.
+                    var currentTime = new Date();
+                    var endTime = new Date(currentTime.getTime() + 10 * 60 * 60 * 1000);
+                    var beginTime = new Date(currentTime.getTime() - 10 * 60 * 60 * 1000);
+                    // Make sure begin time starts from the exact hour.
+                    // Then, timesteps will be on the proper positions when layers are requested.
+                    // If requested times do not match exactly FMI observation times, layers may
+                    // not contain any visible content.
+                    OpenLayers.Layer.Animation.Utils.floorDateToHour(beginTime);
+                    var resolutionTime = 60 * 60 * 1000;
+                    var baseUrl = "http://wms.fmi.fi/fmi-apikey/" + API_KEY + "/geoserver/wms";
+                    var params = {
+                        layers : "Radar:suomi_rr1h_eureffin"
+                    };
+                    // Animation specific configurations inside options object.
+                    // Notice, many of these values are given here to show them as an example.
+                    // Usually, default values may be enough.
+                    var options = {
+                        animation : {
+                            beginTime : beginTime,
+                            endTime : endTime,
+                            resolutionTime : resolutionTime,
+                            autoLoad : true,
+                            autoStart : true,
+                            // Layer name for certain time interval.
+                            // {endTime} may be left {undefined} for the layer object in the {layers} array.
+                            // This means that all the times after {beginTime} are included for that layer.
+                            // Here we use different layername for forecasts. Then, animation starts to show
+                            // forecasts for future times.
+                            layers : [{
+                                // Start using forecast layer data from the current time.
+                                beginTime : currentTime,
+                                layer : "Weather:precipitation-forecast",
+                                // Legend configuration is inherited from the parent animation object.
+                                // Notice, legends can also be configured here to override parent
+                                // configuration. Just for the purpose of an example, flag is set to
+                                // false here.
+                                hasLegend : false,
+                                // Time period specific animation frames may be named.
+                                // Then, the frame uses the name for the layer and
+                                // the time period specific name is given when legend
+                                // is requested via API.
+                                name : "Weather"
+                            }],
+                            // Defines maximum number of asynchronous frame load operations.
+                            // Restrict loading and allow maximum of only 5 layers to be loaded simultaneously.
+                            maxAsyncLoadCount : 5,
+                            // Animation framerate in milliseconds.
+                            frameRate : 1000,
+                            // Animation frame fading information.
+                            fadeIn : {
+                                // Fade in time in milliseconds.
+                                time : 100,
+                                // Function for opacity fade in.
+                                timingFunction : "ease-in"
+                            },
+                            fadeOut : {
+                                // Fade out time in milliseconds.
+                                time : 800,
+                                // Function for opacity fade out step.
+                                timingFunction : "ease-out",
+                                // Opacity values for fade out steps.
+                                opacities : [0.3, 0.1, 0]
+                            },
+                            // Flag to inform if legend may be requested for the layer.
+                            // Notice, default is false. Notice, this value is inherited
+                            // as a default value by period specific layers if they are defined.
+                            hasLegend : true,
+                            // Time period specific animation frames may be named.
+                            // Then, the frame uses the name for the layer and
+                            // the time period specific name is given when legend
+                            // is requested via API.
+                            name : "Radar"
+                        }
+                    };
+
+                    // Notice, WMS Animation class constructor has same structure with OpenLayers.Layer.WMS class.
+                    var animation = (new OpenLayers.Layer.Animation.Wms("My Animation Layer", baseUrl, params, options)).registerController(ctrl.events);
+                    // Alternative way to create layer by using setConfig instead of giving configuration as constructor parameters.
+                    // var animation = (new OpenLayers.Layer.Animation.Wms("Animation Layer")).registerController(MyController.events).setConfig(baseUrl, params, options);
+
+                    // Register to listen animation events.
+                    var events = {
+                        scope : this,
+                        // Some of the functions are set undefined here.
+                        // You may set your own functions here for testing purposes.
+                        animationloadstarted : function() {
+                            // Set status text into HTML element.
+                            jQuery("#animationStatus").html("Status: loading started...");
+                        },
+                        frameloadstarted : undefined,
+                        frameloadcomplete : undefined,
+                        animationloadgroupprogress : undefined,
+                        animationloadcomplete : function() {
+                            // Set status text into HTML element.
+                            jQuery("#animationStatus").html("Status: loading complete.");
+                            // Load legends for layer and present first one as a background image.
+                            var legends = animation.getLegendInfo();
+                            if (legends.length && legends[0].hasLegend) {
+                                jQuery("#legend").css("background-image", "url('" + legends[0].url + "')");
+                            }
+                        },
+                        animationframecontentreleased : undefined,
+                        framechanged : undefined
+                    };
+                    animation.events.on(events);
+
+                    // Add layer to map.
+                    map.addLayer(animation);
+                }
+            });
+        </script>
+    </head>
+    <body>
+        <h2>WMS Animation</h2>
+        <p id="animationStatus">
+            <!-- Animation status text will be set here. -->
+        </p>
+        <div class="simpleContainer">
+            <div id="wmsMap" class="map">
+                <!-- Animation WMS map will be inserted here. -->
+            </div>
+            <div id="legend" class="legend">
+                <!-- One layer legend will be inserted here. -->
+            </div>
+        </div>
+    </body>
+</html>

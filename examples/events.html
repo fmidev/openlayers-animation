@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Animation events example</title>
+
+        <!--
+        Notice, this example uses jQuery ( http://jquery.com/ ).
+        Quick access link is used for jQuery instead of having
+        a local source copy of the component because jQuery is only
+        used with examples.
+        -->
+
+        <!-- Stylesheets -->
+        <link rel="stylesheet" href="../deps/OpenLayers-2.13.1/theme/default/style.css" />
+
+        <!-- Internal style -->
+        <style>
+            .map {
+                height: 400px;
+                width: 400px;
+                border: 1px solid #ccc;
+            }
+        </style>
+
+        <!-- JavaScript -->
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+        <script type="text/javascript" src="../deps/OpenLayers-2.13.1/OpenLayers.js"></script>
+        <script type="text/javascript" src="../lib/openlayers-animation-1.0.0-min.js"></script>
+
+        <script type="text/javascript">
+            jQuery(function() {
+                // API-KEY is required as part of the base URL that is used for the layers
+                // when FMI services are used.
+                var API_KEY = "insert-your-apikey-here";
+                if (!API_KEY || API_KEY === "insert-your-apikey-here") {
+                    var apiKeyErrorStr = "Check HTML source! Proper API-KEY should be set!";
+                    jQuery("#animationStatus").html(apiKeyErrorStr);
+                    alert(apiKeyErrorStr);
+
+                } else {
+
+                    // Create and initialize map with the base layer.
+
+                    var map = new OpenLayers.Map({
+                        div : 'wmsMap',
+                        projection : 'EPSG:3067',
+                        maxExtent : new OpenLayers.Bounds(-118331.366408, 6335621.167014, 875567.731907, 7907751.537264)
+                    });
+
+                    // Base layer is loaded from the service of National Land Survey of Finland to get a nice map.
+                    // More information about the service: http://kartat.kapsi.fi/
+                    var baseLayer = new OpenLayers.Layer.WMS("NLSFI", "http://tiles.kartat.kapsi.fi/taustakartta", {
+                        layers : "taustakartta"
+                    });
+                    map.addLayer(baseLayer);
+                    // Zoom a little bit to make the initial view look better.
+                    map.zoomTo(1);
+
+                    // Create animation layer.
+
+                    // Controller handles animation events.
+                    var ctrl = {
+                        events : new OpenLayers.Events(this)
+                    };
+
+                    // Initialize options objects for animation.
+                    var endTime = new Date();
+                    var beginTime = new Date(endTime.getTime() - 5 * 60 * 60 * 1000);
+                    // Make sure begin time starts from the exact hour.
+                    // Then, timesteps will be on the proper positions when layers are requested.
+                    // If requested times do not match exactly FMI observation times, layers may
+                    // not contain any visible content.
+                    OpenLayers.Layer.Animation.Utils.floorDateToHour(beginTime);
+                    var resolutionTime = 30 * 60 * 1000;
+                    var baseUrl = "http://wms.fmi.fi/fmi-apikey/" + API_KEY + "/geoserver/Radar/wms";
+                    var params = {
+                        layers : "suomi_rr_eureffin"
+                    };
+                    // Animation specific configurations inside options object.
+                    var options = {
+                        animation : {
+                            beginTime : beginTime,
+                            endTime : endTime,
+                            resolutionTime : resolutionTime,
+                            autoLoad : true,
+                            autoStart : true
+                        }
+                    };
+
+                    // Notice, WMS Animation class constructor has same structure with OpenLayers.Layer.WMS class.
+                    var animation = (new OpenLayers.Layer.Animation.Wms("My Animation Layer", baseUrl, params, options)).registerController(ctrl.events);
+
+                    // Register to listen some animation events.
+                    var events = {
+                        scope : this,
+                        // Some of the functions are set undefined here.
+                        // You may set your own functions here for testing purposes.
+                        animationloadstarted : function(event) {
+                            // Set status text into HTML element.
+                            jQuery("#animationStatus").html("Status: loading started...");
+                            jQuery("#animationEvents").append("animationloadstarted event<br>");
+                        },
+                        frameloadstarted : function(event) {
+                            // Set notification about event into HTML element.
+                            jQuery("#animationEvents").append("frameloadstarted event<br>");
+                        },
+                        frameloadcomplete : function(event) {
+                            // Set notification about event into HTML element.
+                            jQuery("#animationEvents").append("frameloadcomplete event<br>");
+                        },
+                        animationloadgroupprogress : function(event) {
+                            // Set notification about event into HTML element.
+                            jQuery("#animationEvents").append("animationloadgroupprogress event<br>");
+                        },
+                        animationloadcomplete : function(event) {
+                            // Set status text into HTML element.
+                            jQuery("#animationStatus").html("Status: loading complete.");
+                            // Set notification about event into HTML element.
+                            jQuery("#animationEvents").append("animationloadcomplete event<br>");
+                        },
+                        animationframecontentreleased : function(event) {
+                            // Set notification about event into HTML element.
+                            jQuery("#animationEvents").append("animationframecontentreleased event<br>");
+                        },
+                        framechanged : function(event) {
+                            // Set notification about event into HTML element.
+                            jQuery("#frameDate").html("Frame time: " + (event.events[0] ? event.events[0].time.toISOString() : "") + " (framechanged event)");
+                        }
+                    };
+                    animation.events.on(events);
+
+                    // Add layer to map.
+                    map.addLayer(animation);
+                }
+            });
+        </script>
+    </head>
+    <body>
+        <h2>WMS Animation</h2>
+        <p id="animationStatus">
+            <!-- Animation status text will be set here. -->
+        </p>
+        <div id="wmsMap" class="map">
+            <!-- Animation WMS map will be inserted here. -->
+        </div>
+        <p id="frameDate">
+            <!-- Animation frame time will be inserted here. -->
+        </p>
+        <p id="animationEvents">
+            <!-- Animation frame events will be inserted here. -->
+        </p>
+    </body>
+</html>

@@ -1,0 +1,6 @@
+.project
+.svn
+.svn/
+.grunt/
+node_modules/
+npm-debug.log
