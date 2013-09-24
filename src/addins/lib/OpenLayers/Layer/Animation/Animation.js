@@ -411,10 +411,13 @@ OpenLayers.Layer.Animation = OpenLayers.Class(OpenLayers.Layer, {
             }
             // Trigger event asynchronously.
             setTimeout(function() {
-                // Trigger event in OpenLayers style.
-                // Then listeners that have registered for this layer
-                // for this event will be informed.
-                _me.events.triggerEvent(eventName, animationEvent);
+                // Events may not exist if map has been destroyed.
+                if (_me.events) {
+                    // Trigger event in OpenLayers style.
+                    // Then listeners that have registered for this layer
+                    // for this event will be informed.
+                    _me.events.triggerEvent(eventName, animationEvent);
+                }
             }, 0);
         };
 

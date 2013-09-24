@@ -952,7 +952,8 @@ OpenLayers.Layer.Animation.LayerContainer = OpenLayers.Class({
 
         var setMap = function(map) {
             if (_map !== map) {
-                if (_map) {
+                // Events may not exist if map has been destroyed.
+                if (_map && _map.events) {
                     // Unregister possible previously registered events for the old map.
                     _map.events.un(_mapEvents);
                 }
