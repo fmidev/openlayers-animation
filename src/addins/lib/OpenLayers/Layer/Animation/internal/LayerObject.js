@@ -349,7 +349,10 @@ OpenLayers.Layer.Animation.LayerObject = OpenLayers.Class({
                         _layer.events.on(_events);
                     }
                 }
-                if (_layer) {
+                // Layer div is created during layer initialization.
+                // Make sure div is available to be sure that map has not been
+                // destroyed during zoom operation. Layer div is removed if map is destroyed.
+                if (_layer && _layer.div) {
                     if (!_layer.map) {
                         // Add layer into the map if it is not already there.
                         // Notice, layer contains information about the map where it has been added to.
@@ -461,7 +464,11 @@ OpenLayers.Layer.Animation.LayerObject = OpenLayers.Class({
                     // Reset state because layer needs to be loaded after this.
                     resetState();
                 }
-                _layer.setVisibility(visibility);
+                // Set layer visibility only if layer belongs to map.
+                // Layer may have been removed if map has been destroyed.
+                if (_layer.map) {
+                    _layer.setVisibility(visibility);
+                }
             }
         };
 
@@ -470,7 +477,7 @@ OpenLayers.Layer.Animation.LayerObject = OpenLayers.Class({
         };
 
         var setZIndex = function(index) {
-            if (index !== undefined && index !== null && !isNaN(index) && _layer) {
+            if (index !== undefined && index !== null && !isNaN(index) && _layer && _layer.map) {
                 _layer.setZIndex(index);
             }
         };
@@ -480,7 +487,7 @@ OpenLayers.Layer.Animation.LayerObject = OpenLayers.Class({
         };
 
         var setOpacity = function(opacity) {
-            if (_layer) {
+            if (_layer && _layer.map) {
                 _layer.setOpacity(opacity);
             }
         };
