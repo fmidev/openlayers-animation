@@ -79,8 +79,17 @@ module.exports = function(grunt) {
             // Notice, src files do not contain version in filename. They can be ignored here.
             version : {
                 files : [{
-                    dest : 'examples/index.html',
-                    src : ['examples/index.html']
+                    dest : 'examples/complex.html',
+                    src : ['examples/complex.html']
+                }, {
+                    dest : 'examples/events.html',
+                    src : ['examples/events.html']
+                }, {
+                    dest : 'examples/minimal.html',
+                    src : ['examples/minimal.html']
+                }, {
+                    dest : 'examples/simple.html',
+                    src : ['examples/simple.html']
                 }],
                 options : {
                     replacements : [{
