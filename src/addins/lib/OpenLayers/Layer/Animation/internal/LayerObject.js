@@ -278,12 +278,6 @@ OpenLayers.Layer.Animation.LayerObject = OpenLayers.Class({
         _events.loadstart = function(event) {
             resetState();
             _state.id = _STATE_LOADING;
-            // Layer olTileImage div is created before image loading is started.
-            // Therefore, the style of that element can be handled here.
-            // In this library, opacity transitions of frames are handled by JS
-            // separately and general OpenLayers CSS opacity transition settings
-            // are ignored. Then, possible flickering during animation can be avoided.
-            setCssTransition("opacity 0");
             if (observer) {
                 observer.layerLoadStartCallback(_me);
             }
@@ -295,6 +289,13 @@ OpenLayers.Layer.Animation.LayerObject = OpenLayers.Class({
             // undefined because also layer has been released from this object.
             if (_state.id) {
                 _state.id = _STATE_READY;
+                // Layer olTileImage div is created before image loading is started.
+                // But, all tiles are available only after load has ended. Therefore,
+                // the style of that element can be handled here. In this library,
+                // opacity transitions of frames are handled by JS separately and
+                // general OpenLayers CSS opacity transition settings are ignored.
+                // Then, possible flickering during animation can be avoided.
+                setCssTransition("opacity 0");
                 if (observer) {
                     observer.layerLoadEndCallback(_me);
                 }
