@@ -372,7 +372,7 @@ OpenLayers.Layer.Animation.LayerContainer = OpenLayers.Class({
      * Create a new animation layer container.
      *
      * @param {Object} observer Observer is informed about the animation progress.
-     *                          May be  {undefined} or {null}.
+     *                          May be {undefined} or {null}.
      */
     initialize : function(observer) {
         // Private variables and initializations.

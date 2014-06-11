@@ -167,6 +167,7 @@
  *         // Animation play information.
  *         // Framerate in milliseconds.
  *         frameRate : {Integer},
+ *         // Animation is automatically started when frame content is available if {autoStart} is set to {true}.
  *         autoStart : {Boolean},
  *         // Animation frame fading information.
  *         // These are used for opacity transitions as transition duration in milliseconds and transition timing function.

@@ -29,7 +29,7 @@
  *     // Notice, you may also define animation specific configurations already by giving values inside configuration object.
  *     animation : { beginTime : {Date}, endTime : {Date}, resolutionTime : {Integer}, autoLoad : true, autoStart : true }
  * };
- * var animation = (new OpenLayers.Layer.Animation.Wms(config)).registerController(ctrl.events);
+ * var animation = (new OpenLayers.Layer.Animation.Wmts(config)).registerController(ctrl.events);
  * // Alternative way to create layer by using setConfig instead of giving configuration as constructor parameters.
  * // var animation = (new OpenLayers.Layer.Animation.Wmts(undefined, "Animation Layer")).registerController(MyController.events).setConfig(config);
  * (end)
