@@ -12,24 +12,6 @@
 OpenLayers.Layer.Animation.Utils = (function() {
 
     /**
-     * Function to set {getElementsByClassName} for elements if an older browser does not support it natively.
-     *
-     * This will provide IE8+ support.
-     * See, http://stackoverflow.com/questions/7410949/javascript-document-getelementsbyclassname-compatibility-with-ie
-     *
-     * This function is called during the construction of this sigleton instance to make sure
-     * function is available.
-     */
-    (function() {
-        if (!document.getElementsByClassName) {
-            document.getElementsByClassName = function(className) {
-                return this.querySelectorAll("." + className);
-            };
-            Element.prototype.getElementsByClassName = document.getElementsByClassName;
-        }
-    })();
-
-    /**
      * Function to set {toISOString} for {Date} objects if an older browser does not support it natively.
      *
      * See, http://stackoverflow.com/questions/11440569/converting-a-normal-date-to-iso-8601-format
