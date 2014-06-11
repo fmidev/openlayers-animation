@@ -295,7 +295,7 @@ OpenLayers.Layer.Animation.LayerObject = OpenLayers.Class({
                 // opacity transitions of frames are handled by JS separately and
                 // general OpenLayers CSS opacity transition settings are ignored.
                 // Then, possible flickering during animation can be avoided.
-                setCssTransition("opacity 0");
+                setCssTransition("opacity 0s");
                 if (observer) {
                     observer.layerLoadEndCallback(_me);
                 }
@@ -501,7 +501,7 @@ OpenLayers.Layer.Animation.LayerObject = OpenLayers.Class({
                 }
                 var div = _layer.div;
                 if (div) {
-                    var tiles = div.getElementsByClassName("olTileImage");
+                    var tiles = div.querySelectorAll(".olTileImage");
                     for (var i = 0; i < tiles.length; ++i) {
                         var tile = tiles[i];
                         tile.style.WebkitTransition = value;
