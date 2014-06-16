@@ -299,7 +299,7 @@ OpenLayers.Layer.Animation = OpenLayers.Class(OpenLayers.Layer, {
     getLegendInfo : undefined,
 
     /**
-     * @method setOpacity
+     * @method setVisibility
      * Public API method that is set when object is initialized.
      *
      * See {OpenLayers.Layer.setVisibility()} for description.
