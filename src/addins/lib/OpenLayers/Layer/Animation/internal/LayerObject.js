@@ -276,10 +276,16 @@ OpenLayers.Layer.Animation.LayerObject = OpenLayers.Class({
         // defined in the constructor.
 
         _events.loadstart = function(event) {
-            resetState();
-            _state.id = _STATE_LOADING;
-            if (observer) {
-                observer.layerLoadStartCallback(_me);
+            // Handle event only if it is called when layer object is in
+            // pre-loading state. This way, possible duplicate events are ignored.
+            // Duplicate events may occur when layer switcher is used to hide and
+            // show animation with multiple layers.
+            if (_state.id === _STATE_PRE_LOADING) {
+                resetState();
+                _state.id = _STATE_LOADING;
+                if (observer) {
+                    observer.layerLoadStartCallback(_me);
+                }
             }
         };
 
