@@ -38,6 +38,8 @@
  *                                  ...
  *                              ]
  *                          }
+ * - frameloadcomplete -- Inform about loading progress when a new frame has been loaded.
+ *                        Event object: see frameloadstarted event object above.
  * - animationloadframeprogress -- Inform about loading progresses when a new frame has been loaded.
  *                                 Event object: see frameloadstarted event object above.
  * - animationloadgroupprogress -- Inform about loading progresses when a new frame group has been loaded.
