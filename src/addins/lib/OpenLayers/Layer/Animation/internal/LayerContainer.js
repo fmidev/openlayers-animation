@@ -985,7 +985,7 @@ OpenLayers.Layer.Animation.LayerContainer = OpenLayers.Class({
             var hasLegend = defaultHasLegend;
             var info = getLayerInfo(time);
             if (info && undefined !== info.hasLegend) {
-                // Because hasLegend is a boolean,
+                // Because hasLegend is a boolean or explicitly given URL string,
                 // use default only if info object is not available at all.
                 hasLegend = info.hasLegend;
             }

@@ -141,10 +141,12 @@
  *     // Also, if an event or setter functions are used later to define corresponding values, their values
  *     // will be used instead of config values.
  *     animation : {
- *         // Flag to inform if legend may be requested for the layer. Notice, default is false.
- *         // Also notice, this value is inherited as a default value by period specific layers
- *         // if they are defined (see below). May be left {undefined}.
- *         hasLegend : {Boolean},
+ *         // Flag to inform if legend may be requested for the layer. Notice, default is {false}.
+ *         // Notice, {string} value may also be used to explicitly define a legend URL. Then, legend URL
+ *         // is not constructed from layer information. Also notice, either {boolean} or {string} value
+ *         // is inherited as a default value by time period specific layers if they are defined (see below).
+ *         // May be left {undefined}.
+ *         hasLegend : {Boolean|String},
  *         // Time period specific animation frames may be named. Then, the frame uses the name for the layer and
  *         // the time period specific name is given when legend is requested via API. Notice, this value is
  *         // inherited as a default value by period specific layers if they are defined. May be left {undefined}.
@@ -154,7 +156,8 @@
  *         // This means that all the times after {beginTime} are included for that layer.
  *         // {hasLegend} Time period specific value. If set, overrides the animation level value.
  *         // {name} Time period specific name for the layer. If set, overrides the animation level value.
- *         layers : [ { beginTime : {Integer|Date}, endTime : {Integer|Date}, layer: {String}, hasLegend : {Boolean}, name : {String} }, ... ],
+ *         layers : [ { beginTime : {Integer|Date}, endTime : {Integer|Date}, layer: {String},
+ *                      hasLegend : {Boolean|String}, name : {String} }, ... ],
  *         // Animation period information.
  *         beginTime : {Integer|Date},
  *         endTime : {Integer|Date},

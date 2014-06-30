@@ -394,16 +394,18 @@ OpenLayers.Layer.Animation.LayerObject = OpenLayers.Class({
                 if (params) {
                     // Layer IDs may be given as an array in layer params.
                     // Property name for IDs depends on the layer class.
-                    // WMS uses layers property name for a string value.
-                    // But, WMTS uses layer property name for a string value.
-                    var layerIds = params.layers || params.LAYERS || params.layer || params.LAYER;
+                    // WMS uses layers property of params object for a string value.
+                    // But, WMTS uses layer property of layer object for a string value.
+                    var layerIds = params.layers || params.LAYERS || _layer.layer || _layer.LAYER;
                     if (layerIds) {
                         layerIds = layerIds.split(",");
                     }
                     // Check that configuration defines that legends should be used.
                     // Also, legend always requires the layer ID.
                     if (_layer.options && _layer.options.animation && layerIds && layerIds.length) {
-                        var url = _layer.url;
+                        // Legend URL is constructed from layer information, unless it is explicitly given URL string.
+                        var isExplicitUrl = "string" === typeof _layer.options.animation.hasLegend && _layer.options.animation.hasLegend;
+                        var url = isExplicitUrl ? encodeURI(_layer.options.animation.hasLegend) : _layer.url;
                         // URL may be string or an array.
                         if ("string" !== typeof url) {
                             if (url && url.length) {
@@ -419,23 +421,26 @@ OpenLayers.Layer.Animation.LayerObject = OpenLayers.Class({
                         }
                         // Make sure URL string is available.
                         if (url) {
-                            // Create GeoServer style legend URL.
-                            // First check if ? or & is required in the end
-                            // of the url before query string.
-                            var lastChar = url.charAt(url.length - 1);
-                            if (url.indexOf("?") === -1) {
-                                // URL does not contain ? yet.
-                                // URL should contain only one ? in the beginning of query.
-                                url += "?";
+                            // Construct legend URL from layer information unless URL has been explicitly given.
+                            if (!isExplicitUrl) {
+                                // Create GeoServer style legend URL.
+                                // First check if ? or & is required in the end
+                                // of the url before query string.
+                                var lastChar = url.charAt(url.length - 1);
+                                if (url.indexOf("?") === -1) {
+                                    // URL does not contain ? yet.
+                                    // URL should contain only one ? in the beginning of query.
+                                    url += "?";
 
-                            } else if (lastChar !== "?" && lastChar !== "&") {
-                                // URL did not end with ? but contains it.
-                                // Append & delimiter to the beginning of the query
-                                // because it was not included there yet.
-                                url += "&";
+                                } else if (lastChar !== "?" && lastChar !== "&") {
+                                    // URL did not end with ? but contains it.
+                                    // Append & delimiter to the beginning of the query
+                                    // because it was not included there yet.
+                                    url += "&";
+                                }
+                                var imageFormat = params.format || params.FORMAT || "image/png";
+                                url += "REQUEST=GetLegendGraphic&FORMAT=" + encodeURIComponent(imageFormat) + "&LAYER=";
                             }
-                            var imageFormat = params.format || params.FORMAT || "image/png";
-                            url += "REQUEST=GetLegendGraphic&FORMAT=" + encodeURIComponent(imageFormat) + "&LAYER=";
                             // Single layer may contain multiple layer IDs.
                             // Provide separate URL for each layer ID.
                             for (var j = 0; j < layerIds.length; ++j) {
@@ -449,7 +454,7 @@ OpenLayers.Layer.Animation.LayerObject = OpenLayers.Class({
                                     info.push({
                                         // Name may be empty depending if it was originally given for layer.
                                         name : _layer.name,
-                                        url : url + encodeURIComponent(layerId),
+                                        url : isExplicitUrl ? url : url + encodeURIComponent(layerId),
                                         hasLegend : booleanHasLegend
                                     });
                                 }

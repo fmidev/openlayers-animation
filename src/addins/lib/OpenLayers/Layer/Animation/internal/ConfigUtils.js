@@ -437,10 +437,11 @@ OpenLayers.Layer.Animation.ConfigUtils = (function() {
          * @param {Object} config Object should have structure that corresponds the configuration required by
          *                        {OpenLayers.Layer.Animation#doSetConfig} function.
          *                        May be {undefined} or {null} but then {undefined} is returned.
-         * @return {Boolean} Animation {hasLegend} value from the configuration object.
-         *                   {true} if legend may be requested for animation.
-         *                   May be {undefined} if {config} parameter is not given
-         *                   or if animation or its {hasLegend} property is not set in configuration.
+         * @return {Boolean|String} Animation {hasLegend} value from the configuration object.
+         *                          {true} if legend may be requested for animation.
+         *                          May be {String} if legend URL has been explicitly given.
+         *                          May be {undefined} if {config} parameter is not given
+         *                          or if animation or its {hasLegend} property is not set in configuration.
          */
         getAnimationHasLegend : getAnimationHasLegend,
 
@@ -452,8 +453,9 @@ OpenLayers.Layer.Animation.ConfigUtils = (function() {
          * @param {Object} config Object should have structure that corresponds the configuration required by
          *                        {OpenLayers.Layer.Animation#doSetConfig} function.
          *                        May be {undefined} or {null} but then operation is ignored.
-         * @param {Boolean} hasLegend Animation {hasLegend} value for the configuration object.
-         *                            May be {undefined} or {null}.
+         * @param {Boolean|String} hasLegend Animation {hasLegend} value for the configuration object.
+         *                                   May be {String} if legend URL is explicitly given.
+         *                                   May be {undefined} or {null}.
          */
         setAnimationHasLegend : setAnimationHasLegend,
 
