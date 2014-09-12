@@ -129,9 +129,13 @@ OpenLayers.Layer.Animation.LayerObject = OpenLayers.Class({
      * Public API method that is set when object is initialized.
      *
      * Sets the z-index of the layer.
-
+     *
+     * Notice, if layer has not been added into map when this function is called,
+     * given z-index will automatically be set for the layer later when the layer
+     * is added into the map.
+     *
      * @param {Integer} index Z-index of the layer.
-     *                        May be {undefined} or  {null} but then operation is ignored.
+     *                        May be {undefined} or {null} but then operation is ignored.
      */
     setZIndex : undefined,
 
@@ -243,6 +247,9 @@ OpenLayers.Layer.Animation.LayerObject = OpenLayers.Class({
 
         var _me = this;
         var _layer;
+        // Layer z-index is automatically set after layer has been added into map
+        // if z-index has been set before layer is included into map.
+        var _zIndexPending;
         // State will inform if layer has been loaded and if load has been a success.
         // Possible states are
         // - undefined -- not loaded
@@ -366,6 +373,10 @@ OpenLayers.Layer.Animation.LayerObject = OpenLayers.Class({
                         // If layer has been removed, its map is also set to null.
                         _state.id = _STATE_PRE_LOADING;
                         map.addLayer(_layer);
+                        if (undefined !== _zIndexPending) {
+                            _layer.setZIndex(_zIndexPending);
+                            _zIndexPending = undefined;
+                        }
                     }
                     // Layer is now part of the map in all cases.
                     // Also, make sure that it is set visible if necessary.
@@ -489,8 +500,14 @@ OpenLayers.Layer.Animation.LayerObject = OpenLayers.Class({
         };
 
         var setZIndex = function(index) {
-            if (index !== undefined && index !== null && !isNaN(index) && _layer && _layer.map) {
-                _layer.setZIndex(index);
+            if (index !== undefined && index !== null && !isNaN(index)) {
+                if (_layer && _layer.map) {
+                    _layer.setZIndex(index);
+
+                } else {
+                    // Layer z-index will be set after layer is added into map.
+                    _zIndexPending = index;
+                }
             }
         };
 

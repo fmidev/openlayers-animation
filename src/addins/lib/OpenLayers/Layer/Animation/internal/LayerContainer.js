@@ -261,6 +261,17 @@ OpenLayers.Layer.Animation.LayerContainer = OpenLayers.Class({
     setOpacity : undefined,
 
     /**
+     * @method setZIndex
+     * Public API method that is set when object is initialized.
+     *
+     * Sets the the z-index of the container and its content.
+     *
+     * @param {Integer} index Z-index of the layer.
+     *                        May be {undefined} or {null} but then operation is ignored.
+     */
+    setZIndex : undefined,
+
+    /**
      * @method reset
      * Public API method that is set when object is initialized.
      *
@@ -1220,6 +1231,15 @@ OpenLayers.Layer.Animation.LayerContainer = OpenLayers.Class({
             }
         };
 
+        var setZIndex = function(index) {
+            if (index !== undefined && index !== null && !isNaN(index)) {
+                for (var i = 0; i < _layers.length; ++i) {
+                    var layer = _layers[i];
+                    layer.setZIndex(index);
+                }
+            }
+        };
+
         var reset = function() {
             // Stop possible ongoing animation.
             stopAnimation();
@@ -1423,6 +1443,9 @@ OpenLayers.Layer.Animation.LayerContainer = OpenLayers.Class({
 
         // See API for method description.
         this.setOpacity = setOpacity;
+
+        // See API for method description.
+        this.setZIndex = setZIndex;
 
         // See API for method description.
         this.reset = reset;

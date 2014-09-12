@@ -329,6 +329,20 @@ OpenLayers.Layer.Animation = OpenLayers.Class(OpenLayers.Layer, {
     setOpacity : undefined,
 
     /**
+     * @method setZIndex
+     * Public API method that is set when object is initialized.
+     *
+     * See {OpenLayers.Layer.setZindex()} for description.
+     * Sets the z-index for the entire layer including sublayers.
+     * This uses the parent implementation and also changes z-index
+     * of animation frames accordingly.
+     *
+     * @param {Integer} index Z-index of the layer.
+     *                        May be {undefined} or {null} but then operation is ignored.
+     */
+    setZIndex : undefined,
+
+    /**
      * Constructor: OpenLayers.Layer.Animation
      * This is used as class constructor by OpenLayers framework
      * when a new class instance is created.
@@ -550,6 +564,9 @@ OpenLayers.Layer.Animation = OpenLayers.Class(OpenLayers.Layer, {
                 setTimeout(function() {
                     // This layer was added to the map.
                     _layerContainer.setMap(event.map);
+                    // Make sure animation frames have same z-index
+                    // as the wrapping animation layer.
+                    _layerContainer.setZIndex(_me.getZIndex());
                 }, 0);
             }
         };
@@ -619,6 +636,11 @@ OpenLayers.Layer.Animation = OpenLayers.Class(OpenLayers.Layer, {
             _layerContainer.setOpacity(opacity);
         };
 
+        var setZIndex = function(index) {
+            OpenLayers.Layer.prototype.setZIndex.call(this, index);
+            _layerContainer.setZIndex(index);
+        };
+
         // Private initializations.
         // This is done after necessary functions have been defined.
 
@@ -662,6 +684,9 @@ OpenLayers.Layer.Animation = OpenLayers.Class(OpenLayers.Layer, {
 
         // See API for method description.
         this.setOpacity = setOpacity;
+
+        // See API for method description.
+        this.setZIndex = setZIndex;
     },
 
     CLASS_NAME : "OpenLayers.Layer.Animation"
